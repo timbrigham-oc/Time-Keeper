@@ -56,7 +56,7 @@ if ($task -eq $null) {
 
 
 $btChoices = @(
-    New-BTSelectionBoxItem -Id 'Uncategorized' -Content 'Uncategorized' 
+    New-BTSelectionBoxItem -Id 'General Support' -Content 'General Support' 
 )
 
 Start-Transcript "C:\Temp\transcript.txt"  -ErrorAction SilentlyContinue
@@ -92,7 +92,7 @@ foreach ($category in $workCategories) {
 $InputSplat = @{
     Id                        = 'WorkItem'
     Title                     = 'Select Work Category'
-    DefaultSelectionBoxItemId = 'Uncategorized'
+    DefaultSelectionBoxItemId = 'General Support'
     Items                     = $btChoices
 }
 $BTInput = New-BTInput @InputSplat
