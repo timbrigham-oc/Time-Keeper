@@ -1,10 +1,8 @@
 # This is a burnt toast notification script. 
 
-# Build a choice box that has the following options:
-# CIS hardening
-# General meeting 
-# Support work 
-# Axonius 
+# First see if there is a "Time Keeper" scheduled task configured. 
+# If not, create one.
+
 
 $Activated = {
     if ($Event.SourceArgs[1].Arguments -eq 'dismiss') {
@@ -90,8 +88,6 @@ $BTInput = @(
 
 
 $text1 = New-BTText -Content 'Work Tracker'
-
-
 $Submit = New-BTButton -Content 'Submit' -Arguments 'SubmitButton' -ActivationType Foreground
 # Submit is Microsoft.Toolkit.Uwp.Notifications.ToastButton
 $Dismiss = New-BTButton -Dismiss
