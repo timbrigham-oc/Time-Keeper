@@ -9,6 +9,8 @@
 $Activated = {
     if ($Event.SourceArgs[1].Arguments -eq 'dismiss') {
         Write-Host "Toast was dismissed"
+        $lockFile = Join-Path -Path $env:OneDrive -ChildPath "TimeLog-Output.lock"
+        New-Item -Path $lockFile -ItemType File -Force -ErrorAction SilentlyContinue | Out-Null
         continue 
     }
     #write-host "Activated"
@@ -38,26 +40,6 @@ $Activated = {
     # Touch the lock file to indicate that the script has run
     New-Item -Path $lockFile -ItemType File -Force -ErrorAction SilentlyContinue | Out-Null
 }
-
-<#
-# Before proceeding any further, verify there is a scheduled task "Time Keeper" that runs this script every hour from 9 to 5 under the current user's context.
-$taskName = 'Time Keeper'
-# Check if the task exists
-$task = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
-if ($task -eq $null) {
-    Write-Host "Scheduled task '$taskName' does not exist. Creating it."
-    # Create the scheduled task to run this script every hour from 9 AM to 5 PM
-    $action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument "-File `"$PSScriptRoot\toast.ps1`""
-    $trigger = New-ScheduledTaskTrigger -Once -At '09:00AM' -RepetitionInterval (New-TimeSpan -Hours 1) -RepetitionDuration (New-TimeSpan -Hours 8)
-    $trigger.DaysInterval = 1
-    $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
-    # Run the task under the current user's context
-    $principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -LogonType Interactive 
-    $task = New-ScheduledTask -Action $action -Trigger $trigger -Settings $settings -Principal $principal
-    Register-ScheduledTask -TaskName $taskName -InputObject $task
-}
-#>
-
 
 $btChoices = @(
     New-BTSelectionBoxItem -Id 'General Support' -Content 'General Support' 
@@ -101,12 +83,13 @@ $InputSplat = @{
 }
 $BTTextBox = New-BTInput -Id 'Notes' -Title 'Add optional notes (optional)'
 
-
 $BTInput = @( 
     ( New-BTInput @InputSplat ), 
     $BTTextBox 
 )
 
+
+$text1 = New-BTText -Content 'Work Tracker'
 
 
 $Submit = New-BTButton -Content 'Submit' -Arguments 'SubmitButton' -ActivationType Foreground
@@ -115,10 +98,11 @@ $Dismiss = New-BTButton -Dismiss
 # Dismiss is Microsoft.Toolkit.Uwp.Notifications.ToastButtonDismiss subclass 
 $Buttons = @($Submit, $Dismiss)
 # Buttons is an array of Microsoft.Toolkit.Uwp.Notifications.ToastButton
-$Binding1 = New-BTBinding 
+$Binding1 = New-BTBinding -Children $text1
 $Visual1 = New-BTVisual -BindingGeneric $Binding1
 $Actions1 = New-BTAction -Inputs $BTInput -Buttons $Buttons  
-$Content1 = New-BTContent -Actions $Actions1 -Visual $Visual1 -Duration Long -ActivationType Foreground
+#$Content1 = New-BTContent -Actions $Actions1 -Visual $Visual1 -Duration Long -ActivationType Foreground
+$Content1 = New-BTContent -Actions $Actions1 -Visual $Visual1  -ActivationType Foreground -Scenario Reminder 
 
 $csvPath = Join-Path -Path $env:OneDrive -ChildPath "TimeLog-Output.csv"
 $lockFile = Join-Path -Path $env:OneDrive -ChildPath "TimeLog-Output.lock"
