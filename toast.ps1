@@ -19,6 +19,10 @@ $Activated = {
 
     # create a psobject with the user input and the current date and time
     $userInput = $Event.SourceArgs[1].UserInput.value
+    # If userImput is an array, join it into a string with a comma separator
+    if ($userInput -is [array]) {
+        $userInput = $userInput -join ' | '
+    }
     $currentDate = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     # Now the object 
     $userInputObject = [PSCustomObject]@{
@@ -95,8 +99,15 @@ $InputSplat = @{
     DefaultSelectionBoxItemId = 'General Support'
     Items                     = $btChoices
 }
-$BTInput = New-BTInput @InputSplat
-# BTinput is ToastTextBox / ToastSelectionBox 
+$BTTextBox = New-BTInput -Id 'Notes' -Title 'Add optional notes (optional)'
+
+
+$BTInput = @( 
+    ( New-BTInput @InputSplat ), 
+    $BTTextBox 
+)
+
+
 
 $Submit = New-BTButton -Content 'Submit' -Arguments 'SubmitButton' -ActivationType Foreground
 # Submit is Microsoft.Toolkit.Uwp.Notifications.ToastButton
