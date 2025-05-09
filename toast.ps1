@@ -15,8 +15,11 @@ $Activated = {
     Write-host $Event.SourceArgs[1].UserInput.value    
 
     # Append the user input to a file in the user's Documents folder using the shell folder path 
-    $csvPath = Join-Path -Path $env:OneDrive -ChildPath "TimeLog-Output.csv"
-
+    #$csvPath = Join-Path -Path $env:OneDrive -ChildPath "TimeLog-Output.csv"
+    $thisWeek = (Get-Date).AddDays(-1 * (Get-Date).DayOfWeek.value__)
+    $startOfWeek = $thisWeek.ToString("yyyy-MM-dd")    
+    $csvPath = Join-Path -Path $env:OneDrive -ChildPath "TimeLog-Output-$startOfWeek.csv"
+    
     # create a psobject with the user input and the current date and time
     $userInput = $Event.SourceArgs[1].UserInput.value
     # If userImput is an array, join it into a string with a comma separator
@@ -100,7 +103,11 @@ $Actions1 = New-BTAction -Inputs $BTInput -Buttons $Buttons
 #$Content1 = New-BTContent -Actions $Actions1 -Visual $Visual1 -Duration Long -ActivationType Foreground
 $Content1 = New-BTContent -Actions $Actions1 -Visual $Visual1  -ActivationType Foreground -Scenario Reminder 
 
-$csvPath = Join-Path -Path $env:OneDrive -ChildPath "TimeLog-Output.csv"
+# We want to make the CSV file path dynamic and include the date this week started on
+$thisWeek = (Get-Date).AddDays(-1 * (Get-Date).DayOfWeek.value__)
+$startOfWeek = $thisWeek.ToString("yyyy-MM-dd")
+
+$csvPath = Join-Path -Path $env:OneDrive -ChildPath "TimeLog-Output-$startOfWeek.csv"
 $lockFile = Join-Path -Path $env:OneDrive -ChildPath "TimeLog-Output.lock"
 Submit-BTNotification -Content $Content1 -ActivatedAction $Activated 
 
