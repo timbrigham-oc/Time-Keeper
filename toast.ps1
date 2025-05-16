@@ -89,8 +89,9 @@ $BTInput = @(
     $BTTextBox 
 )
 
+$header = New-BTHeader -Id 1 -Title "Time Tracker"
 
-$text1 = New-BTText -Content 'Work Tracker'
+$text1 = New-BTText -Content '================='
 $Submit = New-BTButton -Content 'Submit' -Arguments 'SubmitButton' -ActivationType Foreground
 # Submit is Microsoft.Toolkit.Uwp.Notifications.ToastButton
 $Dismiss = New-BTButton -Dismiss
@@ -101,7 +102,7 @@ $Binding1 = New-BTBinding -Children $text1
 $Visual1 = New-BTVisual -BindingGeneric $Binding1
 $Actions1 = New-BTAction -Inputs $BTInput -Buttons $Buttons  
 #$Content1 = New-BTContent -Actions $Actions1 -Visual $Visual1 -Duration Long -ActivationType Foreground
-$Content1 = New-BTContent -Actions $Actions1 -Visual $Visual1  -ActivationType Foreground -Scenario Reminder 
+$Content1 = New-BTContent -Actions $Actions1 -Visual $Visual1  -Header $header -ActivationType Foreground -Scenario Reminder 
 
 # We want to make the CSV file path dynamic and include the date this week started on
 $thisWeek = (Get-Date).AddDays(-1 * (Get-Date).DayOfWeek.value__)
@@ -109,7 +110,7 @@ $startOfWeek = $thisWeek.ToString("yyyy-MM-dd")
 
 $csvPath = Join-Path -Path $env:OneDrive -ChildPath "TimeLog-Output-$startOfWeek.csv"
 $lockFile = Join-Path -Path $env:OneDrive -ChildPath "TimeLog-Output.lock"
-Submit-BTNotification -Content $Content1 -ActivatedAction $Activated 
+Submit-BTNotification -Content $Content1 -ActivatedAction $Activated -UniqueIdentifier (Get-Date).Ticks
 
 $locked = $false
 for ( $i = 0; $( $i -lt 10 ) -and $( $locked -eq $false ) ; $i++ ) {
