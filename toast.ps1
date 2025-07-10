@@ -47,6 +47,17 @@ $btChoices = @(
 )
 
 Start-Transcript "C:\Temp\transcript.txt"  -ErrorAction SilentlyContinue
+
+# Before taking any further action, be sure the script is running between 8 AM and 5 PM Mon - Fri 
+$now = Get-Date
+$dayOfWeek = $now.DayOfWeek
+if ($dayOfWeek -in @('Saturday', 'Sunday') -or $now.Hour -lt 8 -or $now.Hour -gt 17) {
+    Write-Host "Script is only allowed to run between 8 AM and 5 PM Mon - Fri. Exiting script."
+    Stop-Transcript
+    exit 
+}
+
+
 # Read a file named "WorkCategories.txt" in the same directory as this script and add the contents to the choices
 #$workCategoriesFile = Join-Path -Path $PSScriptRoot -ChildPath 'WorkCategories.txt'
 $workCategoriesFile = Join-Path -Path $env:OneDrive -ChildPath 'WorkCategories.txt'
